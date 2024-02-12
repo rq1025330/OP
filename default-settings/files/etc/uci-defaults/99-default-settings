@@ -1,0 +1,114 @@
+#!/bin/sh
+
+#设置默认主题语言
+uci set luci.main.lang=zh_cn
+uci set luci.main.mediaurlbase=/luci-static/bootstrap
+#uci set luci.main.mediaurlbase=/luci-static/edge
+uci commit luci
+
+#设置时区
+uci set system.@system[-1].hostname='OpenWrt'
+uci set system.@system[0].timezone=CST-8
+uci set system.@system[0].zonename=Asia/Shanghai
+uci -q del system.ntp.server
+uci -q add_list system.ntp.server='ntp.aliyun.com'
+#uci -q add_list system.ntp.server='openwrt.pool.ntp.org'
+uci -q add_list system.ntp.server='time1.cloud.tencent.com'
+#uci -q add_list system.ntp.server='time.ustc.edu.cn'
+uci -q add_list system.ntp.server='cn.pool.ntp.org'
+uci commit system
+	
+#设置network
+#uci set network.wan.ifname='eth0'
+uci set network.lan.ipaddr='10.0.0.1'
+#uci set network.lan.type='bridge'
+#uci set network.lan.ifname='eth1 eth2'
+uci commit network
+
+#设置dhcp
+uci -q set dhcp.lan.ra='hybrid'
+uci -q set dhcp.lan.ndp='hybrid'
+uci -q set dhcp.lan.dhcpv6='hybrid'
+uci -q set dhcp.lan.force='1'
+uci commit dhcp
+
+#删除状态页不需显示的
+rm -f /www/luci-static/resources/view/status/include/25_storage.js
+#rm -f /www/luci-static/resources/view/status/include/20_memory.js
+#rm -f /www/luci-static/resources/view/status/include/50_dsl.js
+#rm -f /www/luci-static/resources/view/status/include/70_ddns.js
+#rm -f /www/luci-static/resources/view/status/include/80_minidlna.js
+rm -f /www/luci-static/resources/view/status/include/80_upnp.js
+rm -f /www/luci-static/resources/view/status/include/90_mwan3.js
+
+#删除不需显示的
+#rm -f /etc/nginx/uci.conf.template-opkg
+#rm -f /etc/config/nginx-opkg
+
+#修改显示固件
+#sed -i "s/LuCI openwrt-22.03 branch/LuCI branch/g" /usr/lib/lua/luci/version.lua
+sed -i "s/git-.*-\(.*\)/git-\1/g" /usr/lib/lua/luci/version.lua
+#sed -i '/DISTRIB_REVISION/d' /etc/openwrt_release
+#echo "DISTRIB_REVISION='R22.4.1'" >> /etc/openwrt_release
+sed -i '/DISTRIB_DESCRIPTION/d' /etc/openwrt_release
+echo "DISTRIB_DESCRIPTION='OpenWrt 23.05'" >> /etc/openwrt_release
+
+#设置ipk菜单位置
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/aria2.lua
+#sed -i 's/services/nas/g' /usr/lib/lua/luci/view/aria2/overview_status.htm
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/hd_idle.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/samba.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/samba4.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/minidlna.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/transmission.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/mjpg-streamer.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/p910nd.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/usb_printer.lua
+#sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/xunlei.lua
+#sed -i 's/services/nas/g'  /usr/lib/lua/luci/view/minidlna_status.htm
+#sed -i 's/\"services\"/\"vpn\"/g'  /usr/lib/lua/luci/controller/vssr.lua
+#sed -i 's/\"services\"/\"vpn\"/g'  /usr/lib/lua/luci/controller/bypass.lua
+#sed -i 's/\"services\"/\"vpn\"/g'  /usr/lib/lua/luci/controller/shadowsocksr.lua
+
+#设置53端口
+#sed -i '/REDIRECT --to-ports 53/d' /etc/firewall.user
+#echo 'iptables -t nat -A PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 53' >> /etc/firewall.user
+#echo 'iptables -t nat -A PREROUTING -p tcp --dport 53 -j REDIRECT --to-ports 53' >> /etc/firewall.user
+#echo '[ -n "$(command -v ip6tables)" ] && ip6tables -t nat -A PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 53' >> /etc/firewall.user
+#echo '[ -n "$(command -v ip6tables)" ] && ip6tables -t nat -A PREROUTING -p tcp --dport 53 -j REDIRECT --to-ports 53' >> /etc/firewall.user
+
+#镜像源替换
+#sed -i 's_downloads.openwrt.org_openwrt.proxy.ustclug.org_' /etc/opkg/distfeeds.conf
+#sed -i 's_downloads.openwrt.org_mirrors.aliyun.com/openwrt_' /etc/opkg/distfeeds.conf
+#sed -i 's_downloads.openwrt.org_mirrors.tuna.tsinghua.edu.cn/openwrt_' /etc/opkg/distfeeds.conf
+sed -i 's_downloads.openwrt.org_mirrors.cloud.tencent.com/openwrt_' /etc/opkg/distfeeds.conf
+#sed -i "s/# //g" /etc/opkg/distfeeds.conf
+#sed -i '/openwrt_luci/ { s/snapshots/releases\/22.03/g; }'  /etc/opkg/distfeeds.conf
+
+#登陆密码
+#sed -i 's/root::0:0:99999:7:::/root:$1$7nXGDqSG$zWSfFepU40MJjIqXfljBs0:19198:0:99999:7:::/g' /etc/shadow
+
+#无线网络相关配置
+#sed -i '/option disabled/d' /etc/config/wireless
+#sed -i '/set wireless.radio${devidx}.disabled/d' /lib/wifi/mac80211.sh
+
+#nginx
+grep -q "uwsgi_read_timeout" /etc/nginx/conf.d/luci.locations 2>/dev/null ||
+	sed -i "s/include uwsgi_params;/include uwsgi_params;\n\t\tuwsgi_read_timeout 300s;/" /etc/nginx/conf.d/luci.locations
+
+sed -i "s/client_max_body_size 128/client_max_body_size 256/" /etc/nginx/uci.conf.template
+sed -i "s/large_client_header_buffers 2 1k/large_client_header_buffers 4 512k/" /etc/nginx/uci.conf.template
+
+#dnsmasq日志记录
+#sed -i '/log-facility/d' /etc/dnsmasq.conf
+#echo 'log-facility=/dev/null' >> /etc/dnsmasq.conf
+
+#接口cgi-bin修改
+#cp -pR /www/cgi-bin/* /www/
+rm -rf /tmp/luci-*
+
+#init.d权限
+#chmod 0755 /etc/init.d/*
+
+exit 0
+
