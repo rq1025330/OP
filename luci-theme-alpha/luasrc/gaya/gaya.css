@@ -825,7 +825,7 @@
  	user-select: none;
  }
 
- .main>.main-left>.nav>li>[data-title="Logout"] {
+ .main>.main-left>.nav>li:last-child {
  	display: flex;
  	padding: 0.5rem 1rem;
  }
@@ -1042,9 +1042,9 @@
  	transition: transform 0.2s ease-in-out;
  }
 
- .main>.main-left>.nav>li>[data-title="Logout"]::before {
+ .main>.main-left>.nav>li:last-child::before {
  	position: absolute;
- 	right: 14px;
+ 	right: 20px;
  	width: 25px;
  	height: 25px;
  	content: "";
@@ -2756,6 +2756,7 @@
  #cbi-firewall-zone .td,
  #cbi-network-switch_vlan .td {
  	width: 100%;
+	min-width: 60px;
  }
 
  .cbi-rowstyle-2 {
@@ -3606,3 +3607,4 @@
  		background: #424242;
  	}
  }
+
