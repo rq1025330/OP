@@ -108,14 +108,18 @@ filters:
     url: https://agit.ai/bauw/y-dns/raw/branch/master/y-dns.txt
     name: y-dns
     id: 1698292796
-  - enabled: false
-    url: https://cdn.jsdelivr.net/gh/TG-Twilight/AWAvenue-Ads-Rule/AWAvenue-Ads-Rule.txt
-    name: AWAvenue-Adblock-Rule
-    id: 1704894746
+  - enabled: true
+    url: https://raw.githubusercontent.com/maxiaof/github-hosts/master/hosts
+    name: Github-hosts
+    id: 1710259841
   - enabled: false
     url: https://raw.hellogithub.com/hosts
     name: GitHub-DNS
     id: 1705419896
+  - enabled: false
+    url: https://cdn.jsdelivr.net/gh/TG-Twilight/AWAvenue-Ads-Rule/AWAvenue-Ads-Rule.txt
+    name: AWAvenue-Adblock-Rule
+    id: 1704894746
 whitelist_filters: []
 user_rules:
   - ""
