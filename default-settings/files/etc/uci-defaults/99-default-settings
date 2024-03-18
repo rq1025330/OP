@@ -3,7 +3,7 @@
 #设置默认主题语言
 uci set luci.main.lang=zh_cn
 uci set luci.main.mediaurlbase=/luci-static/bootstrap
-#uci set luci.main.mediaurlbase=/luci-static/edge
+#uci set luci.main.mediaurlbase=/luci-static/alpha
 uci commit luci
 
 #设置时区
