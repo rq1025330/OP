@@ -9,9 +9,9 @@ PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/rozhuk-im/msd_lite.git
-PKG_SOURCE_DATE:=2023-02-17
-PKG_SOURCE_VERSION:=744d2ef91797471e26b3b117e7aa0ffebbb91106
-PKG_MIRROR_HASH:=589bc57a1032eaf9bcd68b07716893a8758a4244463c6f6e8f595a50fc84d77a
+PKG_SOURCE_DATE:=2024-03-16
+PKG_SOURCE_VERSION:=cfef57f31aba00aa2bfa147b6d491aa16a2a37e8
+PKG_MIRROR_HASH:=89f9a9eb91ac7bc9816d4628282f6814c1026a4f0493a8fa6af69211a5c15f9a
 
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immrotalwrt.org>
 PKG_LICENSE:=BSD-2-Clause
@@ -23,7 +23,7 @@ include $(INCLUDE_DIR)/cmake.mk
 define Package/msd_lite
   SECTION:=net
   CATEGORY:=Network
-  TITLE:=Program for IPTV streaming on the network via HTTP
+  TITLE:=Program for IP TV streaming on the network via HTTP
   URL:=http://www.netlab.linkpc.net/wiki/ru:software:msd:lite
 endef
 

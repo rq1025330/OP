@@ -1,0 +1,1348 @@
+diff -ruN a/doc/zh_CN/index.html.in b/doc/zh_CN/index.html.in
+--- a/doc/zh_CN/index.html.in	1969-12-31 16:00:00.000000000 -0800
++++ b/doc/zh_CN/index.html.in	2023-12-22 05:03:52.908614683 -0800
+@@ -0,0 +1,52 @@
++<!DOCTYPE HTML>
++<html>
++  <head>
++    <link rel="stylesheet" href="/cups.css" type="text/css">
++    <link rel="shortcut icon" href="/apple-touch-icon.png" type="image/png">
++    <meta charset="utf-8">
++    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
++    <meta http-equiv="X-UA-Compatible" content="IE=9">
++    <meta name="viewport" content="width=device-width">
++    <title>Home - CUPS 2.4.7</title>
++  </head>
++  <body>
++    <div class="cups-header">
++      <ul>
++	<li><a href="https://openprinting.github.io/cups/" target="_blank">OpenPrinting CUPS</a></li>
++	<li><a class="active" href="/">首页</a></li>
++	<li><a href="/admin">管理</a></li>
++	<li><a href="/classes/">类别</a></li>
++	<li><a href="/help/">帮助</a></li>
++	<li><a href="/jobs/">任务</a></li>
++	<li><a href="/printers/">打印机</a></li>
++      </ul>
++    </div>
++    <div class="cups-body">
++      <div class="row">
++	<h1>OpenPrinting CUPS 2.4.7</h1>
++	<p> <a class="jumbolink" href="https://openprinting.github.io/" target="_blank">OpenPrinting</a> 为 Linux® 和其他类 Unix® 操作系统开发的基于标准的开源打印系统。CUPS  使用 <a href="https://www.pwg.org/ipp/everywhere.html" target="_blank">IPP Everywhere™</a> 支持打印到本地和网络打印机。</p>
++      </div>
++      <div class="row">
++	<div class="thirds">
++	  <h2>用户</h2>
++	  <p><a href="help/overview.html">CUPS 概述</a></p>
++	  <p><a href="help/options.html">命令行打印与选项</a></p>
++	</div>
++	<div class="thirds">
++	  <h2>管理员</h2>
++	  <p><a href="help/admin.html">添加打印机和类</a></p>
++	  <p><a href="help/policies.html">管理运营策略</a></p>
++	  <p><a href="help/network.html">使用网络打印机</a></p>
++	  <p><a href="help/firewalls.html">防火墙</a></p>
++	  <p><a href="help/man-cupsd.conf.html">cupsd.conf 参考</a></p>
++	</div>
++	<div class="thirds">
++	  <h2>开发人员</h2>
++	  <p><a href="help/cupspm.html">CUPS 编程手册</a></p>
++	  <p><a href="help/api-filter.html">过滤器和后端编程</a></p>
++	</div>
++      </div>
++    </div>
++    <div class="footer">版权所有：© 2021-2022 <a href="https://openprinting.com" target="_blank">OpenPrinting</a>，版权所有。</div>
++  </body>
++</html>
+diff -ruN a/templates/zh_CN/add-class.tmpl b/templates/zh_CN/add-class.tmpl
+--- a/templates/zh_CN/add-class.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/add-class.tmpl	2023-12-14 22:05:50.000000000 -0800
+@@ -0,0 +1,37 @@
++<H2 CLASS="title">添加类</H2>
++
++<FORM METHOD="POST" ACTION="/admin">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
++
++<TABLE>
++<TR>
++<TH CLASS="label">名字:</TH>
++<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127"><BR>
++<SMALL>(可包含除“/”、“#”和空格之外的任何可打印字符)</SMALL></TD>
++</TR>
++<TR>
++<TH CLASS="label">描述:</TH>
++<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127"><BR>
++<SMALL>(容易识别的描述，如： "HP LaserJet with Duplexer")</SMALL></TD>
++</TR>
++<TR>
++<TH CLASS="label">位置:</TH>
++<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127"><BR>
++<SMALL>(备注打印机所在地点，如 "实验室 1")</SMALL></TD>
++</TR>
++<TR>
++<TH CLASS="label">成员:</TH>
++<TD>
++<SELECT NAME="MEMBER_URIS" SIZE="10" MULTIPLE>
++{[member_uris]<OPTION VALUE="{member_uris}" {?member_selected}>{member_names}}
++</SELECT>
++</TD>
++</TR>
++<TR>
++<TD></TD>
++<TD><INPUT TYPE="SUBMIT" VALUE="添加类"></TD>
++</TR>
++</TABLE>
++
++</FORM>
+diff -ruN a/templates/zh_CN/add-printer.tmpl b/templates/zh_CN/add-printer.tmpl
+--- a/templates/zh_CN/add-printer.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/add-printer.tmpl	2023-12-14 22:15:10.000000000 -0800
+@@ -0,0 +1,44 @@
++<H2 CLASS="title">添加打印机</H2>
++
++<FORM METHOD="POST" ACTION="/admin">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
++<INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
++<INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
++<INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
++<INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
++{?current_make!?<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE" VALUE="{current_make}">:}
++{?current_make_and_model!?<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{current_make_and_model}">:}
++
++<TABLE>
++<TR>
++<TH CLASS="label">名称:</TH>
++<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127" VALUE="{?template_name}"><BR>
++<SMALL>(可用除了 "/", "#", 和空格之外的可打印文本)</SMALL></TD>
++</TR>
++<TR>
++<TH CLASS="label">Description:</TH>
++<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127" VALUE="{?PRINTER_INFO}"><BR>
++<SMALL>(容易识别的描述，如: "HP LaserJet with Duplexer")</SMALL></TD>
++</TR>
++<TR>
++<TH CLASS="label">位置:</TH>
++<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127" VALUE="{?PRINTER_LOCATION}"><BR>
++<SMALL>(备注打印机所在地点，如 "实验室 1")</SMALL></TD>
++</TR>
++<TR>
++<TH CLASS="label">连接:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
++</TR>
++<TR>
++<TH CLASS="label">共享:</TH>
++<TD><INPUT TYPE="CHECKBOX" NAME="PRINTER_IS_SHARED" ID="PRINTER_IS_SHARED" {PRINTER_IS_SHARED=1?CHECKED:}>
++<LABEL FOR="PRINTER_IS_SHARED">共享此打印机</LABEL></TD>
++</TR>
++<TR>
++<TD></TD>
++<TD><INPUT TYPE="SUBMIT" VALUE="继续"></TD>
++</TR>
++</TABLE>
++
++</FORM>
+diff -ruN a/templates/zh_CN/admin.tmpl b/templates/zh_CN/admin.tmpl
+--- a/templates/zh_CN/admin.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/admin.tmpl	2023-12-22 20:03:22.000000000 -0800
+@@ -0,0 +1,81 @@
++<div class="row">
++  <div class="halves">
++    <H2 CLASS="title">打印机</H2>
++
++    <P>
++    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="SUBMIT" VALUE="添加打印机"></FORM>
++    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="find-new-printers"><INPUT TYPE="SUBMIT" VALUE="查找新打印机"></FORM>
++    <FORM ACTION="/printers/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="管理打印机"></FORM>
++    </P>
++
++    <H2 CLASS="title">类别</H2>
++
++    <P>
++    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-class"><INPUT TYPE="SUBMIT" VALUE="添加类"></FORM>
++    <FORM ACTION="/classes/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="管理类"></FORM>
++    </P>
++
++    <H2 CLASS="title">任务</H2>
++
++    <P>
++    <FORM ACTION="/jobs/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="打印任务管理"></FORM>
++    </P>
++  </div>
++  <div class="halves">
++    <H2 CLASS="title">服务器</H2>
++
++    <P>
++    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server"><INPUT TYPE="SUBMIT" VALUE="编辑配置文件"></FORM>
++    </P>
++
++    {SETTINGS_ERROR?<P>{SETTINGS_MESSAGE}</P>
++    <BLOCKQUOTE>{SETTINGS_ERROR}</BLOCKQUOTE>:
++
++    <FORM METHOD="POST" ACTION="/admin">
++    <INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++
++    {ADVANCEDSETTINGS?<P><B>服务器设置\:</B></P>
++
++    <P><A HREF="/admin/">高级 <SMALL>&#x25bc;</SMALL></A><BR>
++    <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
++    <INPUT TYPE="HIDDEN" NAME="ADVANCEDSETTINGS" VALUE="YES">
++    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" ID="SHARE_PRINTERS" {?share_printers}><LABEL FOR="SHARE_PRINTERS"> 共享连接到该系统的打印机</LABEL><BR>
++    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最大客户端数量\:
++    <INPUT TYPE="TEXT" NAME="MAX_CLIENTS" VALUE="{?max_clients}" SIZE="6"><BR>
++    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" ID="REMOTE_ANY" {?remote_any}><LABEL FOR="REMOTE_ANY">  允许从 Internet 打印</LABEL><BR>
++    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="BROWSE_WEB_IF" ID="BROWSE_WEB_IF" {?browse_web_if}><LABEL FOR="BROWSE_WEB_IF">  广告 Web界面</LABEL><BR>
++    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" ID="REMOTE_ADMIN" {?remote_admin}><LABEL FOR="REMOTE_ADMIN">  允许远程管理</LABEL><BR>
++    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" ID="KERBEROS" {?kerberos}><LABEL FOR="KERBEROS"> 使用 Kerberos 身份验证 (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)</LABEL><BR>:}
++    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" ID="USER_CANCEL_ANY" {?user_cancel_any}><LABEL FOR="USER_CANCEL_ANY">  允许用户取消所有任务（含别人的打印任务）</LABEL><BR>
++    <INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOBS" ID="PRESERVE_JOBS" {?preserve_jobs}><LABEL FOR="PRESERVE_JOBS">  保留任务历史记录</LABEL><BR>
++    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最大任务数 (0 无限制)\:
++    <INPUT TYPE="TEXT" NAME="MAX_JOBS" VALUE="{?max_jobs}" SIZE="6"><BR>
++    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保留元数据\:
++    <INPUT TYPE="TEXT" NAME="PRESERVE_JOB_HISTORY" VALUE="{?preserve_job_history}" SIZE="6"><BR>
++    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保留文件\:
++    <INPUT TYPE="TEXT" NAME="PRESERVE_JOB_FILES" VALUE="{?preserve_job_files}" SIZE="6"><BR>
++    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" ID="DEBUG_LOGGING" {?debug_logging}><LABEL FOR="DEBUG_LOGGING">  保存调试信息以用于故障排除</LABEL><BR>
++    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最大日志文件大小\:
++    <INPUT TYPE="TEXT" NAME="MAX_LOG_SIZE" VALUE="{?max_log_size}" SIZE="6"></P>
++
++    :<P><B>服务器设置:</B></P>
++
++    <P><A HREF="/admin/?ADVANCEDSETTINGS=YES">高级 <SMALL>&#x25b6;</SMALL></A><BR>
++    <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
++    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" ID="SHARE_PRINTERS" {?share_printers}><LABEL FOR="SHARE_PRINTERS"> 共享连接到该系统的打印机</LABEL><BR>
++    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" ID="REMOTE_ANY" {?remote_any}><LABEL FOR="REMOTE_ANY">  允许从 Internet 打印</LABEL><BR>
++    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" ID="REMOTE_ADMIN" {?remote_admin}><LABEL FOR="REMOTE_ADMIN">  允许远程管理</LABEL><BR>
++    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" ID="KERBEROS" {?kerberos}><LABEL FOR="KERBEROS">  使用 Kerberos 身份验证 (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)</LABEL><BR>:}
++    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" ID="USER_CANCEL_ANY" {?user_cancel_any}><LABEL FOR="USER_CANCEL_ANY">  允许用户取消所有任务（含别人的打印任务）</LABEL><BR>
++    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" ID="DEBUG_LOGGING" {?debug_logging}><LABEL FOR="DEBUG_LOGGING">  保存调试信息以用于故障排除</LABEL></P>
++
++    }
++    <P><INPUT TYPE="SUBMIT" NAME="CHANGESETTINGS" VALUE="更改设置"></P>
++
++    </FORM>}
++  </div>
++</div>
++
++<div class="row">
++  <H2 CLASS="title"> cups </H2>
++</div>
+\ 文件尾没有换行符
+diff -ruN a/templates/zh_CN/choose-device.tmpl b/templates/zh_CN/choose-device.tmpl
+--- a/templates/zh_CN/choose-device.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/choose-device.tmpl	2023-12-14 22:50:58.000000000 -0800
+@@ -0,0 +1,49 @@
++<H2 CLASS="title">{op=modify-printer?修改 {printer_name}:添加打印机}</H2>
++
++{CUPS_GET_DEVICES_DONE?<FORM METHOD="POST" ACTION="/admin">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
++{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
++
++<TABLE>
++{op=add-printer?:<TR>
++<TH CLASS="label">当前连接\:</TH>
++<TD><INPUT TYPE="RADIO" NAME="DEVICE_URI" ID="{current_device_uri}" VALUE="{current_device_uri}" CHECKED>
++<LABEL FOR="{current_device_uri}">{current_device_uri}</LABEL></TD>
++</TR>}
++<TR>
++<TH CLASS="label">本地打印机\:</TH>
++<TD>
++{[device_uri]{device_class!network?<INPUT TYPE="RADIO" NAME="DEVICE_URI" ID="{device_uri}"
++VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">
++<LABEL FOR="{device_uri}">{device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}</LABEL><BR>
++:}}
++</TD>
++</TR>
++<TR>
++<TH CLASS="label">发现的网络打印机\:</TH>
++<TD>
++{[device_uri]{device_class=network?{device_uri~[a-z]+://?<INPUT TYPE="RADIO" NAME="DEVICE_URI" ID="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}"
++VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">
++<LABEL FOR="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">{device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}</LABEL><BR>
++:}:}}
++</TD>
++</TR>
++<TR>
++<TR>
++<TH CLASS="label">其它网络打印机\:</TH>
++<TD>
++{[device_uri]{device_class=network?{device_uri~[a-z]+://?:<INPUT TYPE="RADIO" NAME="DEVICE_URI" ID="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}"
++VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">
++<LABEL FOR="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">{device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}</LABEL><BR>
++}:}}
++</TD>
++</TR>
++<TR>
++<TD></TD>
++<TD><INPUT TYPE="SUBMIT" VALUE="继续"></TD>
++</TR>
++</TABLE>
++
++</FORM>:<P><IMG SRC="/images/wait.gif" WIDTH="16" HEIGHT="16" ALIGN="ABSMIDDLE"
++ALT="Busy Indicator"> 正在寻找打印机...</P>}
+diff -ruN a/templates/zh_CN/choose-make.tmpl b/templates/zh_CN/choose-make.tmpl
+--- a/templates/zh_CN/choose-make.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/choose-make.tmpl	2023-12-15 13:01:20.000000000 -0800
+@@ -0,0 +1,61 @@
++<H2 CLASS="title">{op=modify-printer?打印机修改： {printer_name}:添加打印机}</H2>
++
++<FORM METHOD="POST" ACTION="/admin" ENCTYPE="multipart/form-data">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
++{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
++<INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
++<INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
++<INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
++<INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
++
++<TABLE>
++{op=modify-printer?:<TR>
++<TH CLASS="label">名称:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">{printer_name}</TD>
++</TR>}
++<TR>
++<TH CLASS="label">描述:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{printer_info}">{printer_info}</TD>
++</TR>
++<TR>
++<TH CLASS="label">本地:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{printer_location}">{printer_location}</TD>
++</TR>
++<TR>
++<TH CLASS="label">连接:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
++</TR>
++<TR>
++<TH CLASS="label">共享:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_IS_SHARED" VALUE="{?printer_is_shared}">
++{?printer_is_shared=?不:{?printer_is_shared=0?不:}} 共享此打印机</TD>
++</TR>
++<TR>
++<TH CLASS="label">厂商:</TH>
++<TD>
++<SELECT NAME="PPD_MAKE" SIZE="10">
++{[ppd_make]<OPTION VALUE="{ppd_make}" {?current_make={ppd_make}?SELECTED:}>{ppd_make}}
++</SELECT>
++</TD>
++</TR>
++<TR>
++<TD></TD>
++<TD><INPUT TYPE="SUBMIT" VALUE="继续"></TD>
++</TR>
++<TR>
++<TD></TD>
++<TD>&nbsp;</TD>
++</TR>
++<TR>
++<TH CLASS="label">提供 PPD 文件:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="MAX_FILE_SIZE" VALUE="262144"><INPUT
++TYPE="FILE" NAME="PPD_FILE"></TD>
++</TR>
++<TR>
++<TD></TD>
++<TD><INPUT TYPE="SUBMIT" VALUE="{op=add-printer?添加打印机:修改打印机}"></TD>
++</TR>
++</TABLE>
++
++</FORM>
+diff -ruN a/templates/zh_CN/choose-model.tmpl b/templates/zh_CN/choose-model.tmpl
+--- a/templates/zh_CN/choose-model.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/choose-model.tmpl	2023-12-15 13:02:04.000000000 -0800
+@@ -0,0 +1,58 @@
++<H2 CLASS="title">{op=modify-printer?打印机修改： {printer_name}:添加打印机}</H2>
++
++<FORM METHOD="POST" ACTION="/admin" ENCTYPE="multipart/form-data">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
++{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
++<INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
++<INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
++<INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
++<INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
++<TABLE>
++{op=modify-printer?:<TR>
++<TH CLASS="label">名称:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">{printer_name}</TD>
++</TR>}
++<TR>
++<TH CLASS="label">描述:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{printer_info}">{printer_info}</TD>
++</TR>
++<TR>
++<TH CLASS="label">本地:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{printer_location}">{printer_location}</TD>
++</TR>
++<TR>
++<TH CLASS="label">连接:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
++</TR>
++<TR>
++<TH CLASS="label">共享:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_IS_SHARED" VALUE="{?printer_is_shared}">
++{?printer_is_shared=?不:{?printer_is_shared=0?不:}} 共享此打印机</TD>
++</TR>
++<TR>
++<TH CLASS="label">厂商:</TH>
++<TD>{PPD_MAKE} <INPUT TYPE="SUBMIT" NAME="SELECT_MAKE" VALUE="Select Another Make/Manufacturer"></TD>
++</TR>
++<TR>
++<TH CLASS="label">型号:</TH>
++<TD>
++<SELECT NAME="PPD_NAME" SIZE="10">
++{op=add-printer?:<OPTION VALUE="__no_change__" SELECTED>当前驱动程序 - {current_make_and_model}</OPTION>:}
++{show_ipp_everywhere?<OPTION VALUE="everywhere" SELECTED>{current_make_and_model?{current_make_and_model} -:} IPP Everywhere &trade;</OPTION>:}
++{[ppd_name]<OPTION VALUE="{ppd_name}" {op=modify-printer?:{?current_make_and_model={ppd_make_and_model}?SELECTED:}}>{ppd_make_and_model} ({ppd_natural_language})
++}</SELECT>
++</TD>
++</TR>
++<TR>
++<TH CLASS="label">提供 PPD 文件:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="MAX_FILE_SIZE" VALUE="262144"><INPUT
++TYPE="FILE" NAME="PPD_FILE"></TD>
++</TR>
++<TR>
++<TD></TD>
++<TD><INPUT TYPE="SUBMIT" VALUE="{op=add-printer?添加打印机:修改打印机}"></TD>
++</TR>
++</TABLE>
++
++</FORM>
+diff -ruN a/templates/zh_CN/choose-serial.tmpl b/templates/zh_CN/choose-serial.tmpl
+--- a/templates/zh_CN/choose-serial.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/choose-serial.tmpl	2023-12-15 12:39:08.000000000 -0800
+@@ -0,0 +1,49 @@
++<H2 CLASS="title">{op=modify-printer?打印机修改：{printer_name}:添加打印机}</H2>
++
++<FORM METHOD="POST" ACTION="/admin">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
++{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
++
++<TABLE>
++<TR>
++<TH CLASS="label">连接:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
++</TR>
++<TR>
++<TH CLASS="label">波特率:</TH>
++<TD><SELECT NAME="BAUDRATE">
++{[baudrates]<OPTION {?baudrate={baudrates}?SELECTED:}>{baudrates}}
++</SELECT></TD>
++</TR>
++<TR>
++<TH CLASS="label">电平:</TH>
++<TD><SELECT NAME="PARITY">
++<OPTION VALUE="none" {?parity=none?SELECTED:}>None
++<OPTION VALUE="even" {?parity=even?SELECTED:}>Even
++<OPTION VALUE="odd" {?parity=odd?SELECTED:}>Odd
++</SELECT></TD>
++</TR>
++<TR>
++<TH CLASS="label">数据位:</TH>
++<TD><SELECT NAME="BITS">
++<OPTION {?bits=8?SELECTED:}>8
++<OPTION {?bits=7?SELECTED:}>7
++</SELECT></TD>
++</TR>
++<TR>
++<TH CLASS="label">流量控制:</TH>
++<TD><SELECT NAME="FLOW">
++<OPTION VALUE="none" {?flow=none?SELECTED:}>None
++<OPTION VALUE="soft" {?flow=soft?SELECTED:}>XON/XOFF (Software)
++<OPTION VALUE="hard" {?flow=hard?SELECTED:}>RTS/CTS (Hardware)
++<OPTION VALUE="dtrdsr" {?flow=dtrdsr?SELECTED:}>DTR/DSR (Hardware)
++</SELECT></TD>
++</TR>
++<TR>
++<TD></TD>
++<TD><INPUT TYPE="SUBMIT" VALUE="继续"></TD>
++</TR>
++</TABLE>
++
++</FORM>
+diff -ruN a/templates/zh_CN/choose-uri.tmpl b/templates/zh_CN/choose-uri.tmpl
+--- a/templates/zh_CN/choose-uri.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/choose-uri.tmpl	2023-12-15 12:39:00.000000000 -0800
+@@ -0,0 +1,40 @@
++<H2 CLASS="title">{op=modify-printer?打印机修改： {printer_name}:添加打印机}</H2>
++
++<FORM METHOD="POST" ACTION="/admin">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
++{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
++<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{?current_make_and_model}">
++
++<TABLE>
++<TR>
++<TH CLASS="label">连接:</TH>
++<TD><INPUT TYPE="URL" SIZE="60" MAXLENGTH="1023" NAME="DEVICE_URI" VALUE="{current_device_uri?{current_device_uri}:{device_uri}}"></TD>
++</TR>
++<TR>
++<TD></TD>
++<TD>例:
++<PRE>
++    http://hostname:631/ipp/
++    http://hostname:631/ipp/port1
++
++    ipp://hostname/ipp/
++    ipp://hostname/ipp/port1
++
++    lpd://hostname/queue
++
++    socket://hostname
++    socket://hostname:9100
++</PRE>
++
++<P>See <A HREF="/help/network.html" TARGET="_blank">"网络打印机"</A> 的正确 URI.</P>
++
++</TD>
++</TR>
++<TR>
++<TD></TD>
++<TD><INPUT TYPE="SUBMIT" VALUE="继续"></TD>
++</TR>
++</TABLE>
++
++</FORM>
+diff -ruN a/templates/zh_CN/class-added.tmpl b/templates/zh_CN/class-added.tmpl
+--- a/templates/zh_CN/class-added.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/class-added.tmpl	2023-12-15 19:58:24.000000000 -0800
+@@ -0,0 +1,3 @@
++<H2 CLASS="title">添加类</H2>
++
++<P>Class <A HREF="/classes/{printer_name}">{printer_name}</A> 添加成功.
+diff -ruN a/templates/zh_CN/class-confirm.tmpl b/templates/zh_CN/class-confirm.tmpl
+--- a/templates/zh_CN/class-confirm.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/class-confirm.tmpl	2023-12-15 19:51:12.000000000 -0800
+@@ -0,0 +1,6 @@
++<H2 CLASS="title">删除类 {printer_name}</H2>
++
++<P><B>警告:</B> 您确定要删除类
++{printer_name} ?</P>
++
++<P ALIGN="CENTER"><FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="op" VALUE="delete-class"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}"><INPUT TYPE="SUBMIT" NAME="confirm" VALUE="删除类"></FORM></P>
+diff -ruN a/templates/zh_CN/class-deleted.tmpl b/templates/zh_CN/class-deleted.tmpl
+--- a/templates/zh_CN/class-deleted.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/class-deleted.tmpl	2023-12-14 23:37:50.000000000 -0800
+@@ -0,0 +1,3 @@
++<H2 CLASS="title">删除类 {printer_name}</H2>
++
++<P>类 {printer_name} 删除成功.
+diff -ruN a/templates/zh_CN/classes-header.tmpl b/templates/zh_CN/classes-header.tmpl
+--- a/templates/zh_CN/classes-header.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/classes-header.tmpl	2023-12-15 20:21:56.000000000 -0800
+@@ -0,0 +1 @@
++<P ALIGN="CENTER">{total=0?没有类:显示类数：{#printer_name} 总类数：{total} }</P>
+diff -ruN a/templates/zh_CN/classes.tmpl b/templates/zh_CN/classes.tmpl
+--- a/templates/zh_CN/classes.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/classes.tmpl	2023-12-14 23:48:48.000000000 -0800
+@@ -0,0 +1,11 @@
++{#printer_name=0?:
++<TABLE CLASS="list" SUMMARY="类列表">
++<THEAD>
++<TR><TH>队列名称</TH><TH>描述</TH><TH>位置</TH><TH>成员</TH><TH>状态</TH></TR>
++</THEAD>
++<TBODY>
++{[printer_name]
++<TR><TD><A HREF="{printer_uri_supported}">{printer_name}</A></TD><TD>{printer_info}</TD><TD>{printer_location}</TD><TD>{?member_uris=?无:{member_uris}}</TD><TD>{printer_state=3?空闲:{printer_state=4?处理中:已暂停}}{printer_state_message? - "{printer_state_message}":}</TD></TR>
++}
++</TBODY>
++</TABLE></DIV>}
+diff -ruN a/templates/zh_CN/class-jobs-header.tmpl b/templates/zh_CN/class-jobs-header.tmpl
+--- a/templates/zh_CN/class-jobs-header.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/class-jobs-header.tmpl	2023-12-14 23:55:20.000000000 -0800
+@@ -0,0 +1 @@
++<H3 CLASS="title">任务</H3>
+diff -ruN a/templates/zh_CN/class-modified.tmpl b/templates/zh_CN/class-modified.tmpl
+--- a/templates/zh_CN/class-modified.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/class-modified.tmpl	2023-12-14 23:56:16.000000000 -0800
+@@ -0,0 +1,4 @@
++<H2 CLASS="title">修改类 {printer_name}</H2>
++
++<P>Class <A HREF="/classes/{printer_name}">{printer_name}</A> has been
++修改成功.
+diff -ruN a/templates/zh_CN/class.tmpl b/templates/zh_CN/class.tmpl
+--- a/templates/zh_CN/class.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/class.tmpl	2023-12-15 13:10:02.000000000 -0800
+@@ -0,0 +1,41 @@
++<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
++({printer_state=3?空闲:{printer_state=4?处理中:已暂停}},
++{printer_is_accepting_jobs=0?拒绝任务:就绪},
++{server_is_sharing_printers=0?Not:{printer_is_shared=0?Not:}} 共享{default_name={printer_name}?, 默认服务器:})</H2>
++
++<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
++<OPTION VALUE="">维护</OPTION>
++<OPTION VALUE="print-test-page">打印测试页</OPTION>
++{printer_state=5?<OPTION VALUE="start-class">恢复类</OPTION>:<OPTION VALUE="stop-class">暂停类</OPTION>}
++{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">接受任务</OPTION>:<OPTION VALUE="reject-jobs">拒绝任务</OPTION>}
++<OPTION VALUE="move-jobs">移动所有任务</OPTION>
++<OPTION VALUE="cancel-jobs">取消所有任务</OPTION>
++</SELECT>
++<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
++</FORM>
++
++<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
++<INPUT TYPE="HIDDEN" NAME="IS_CLASS" VALUE="1">
++<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
++<OPTION VALUE="">管理</OPTION>
++<OPTION VALUE="modify-class">修改类</OPTION>
++<OPTION VALUE="delete-class">删除类</OPTION>
++<OPTION VALUE="set-class-options">设置默认选项</OPTION>
++<OPTION VALUE="set-as-default">设置为服务器默认值</OPTION>
++<OPTION VALUE="set-allowed-users">设置许可用户</OPTION>
++</SELECT>
++<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
++</FORM>
++
++<TABLE SUMMARY="{printer_name}">
++<TR><TH ALIGN="RIGHT" VALIGN="TOP">描述:</TH><TD>{printer_info}</TD></TR>
++<TR><TH ALIGN="RIGHT" VALIGN="TOP">位置:</TH><TD>{printer_location}</TD></TR>
++<TR><TH ALIGN="RIGHT" VALIGN="TOP">成员:</TH><TD>{?member_uris=?None:{member_uris}}</TD></TR>
++<TR><TH ALIGN="RIGHT" VALIGN="TOP">默认:</TH><TD>job-sheets={job_sheets_default}
++media={media_default?{media_default}:unknown}
++{sides_default?sides={sides_default}:}</TD></TR>
++</TABLE>
+diff -ruN a/templates/zh_CN/command.tmpl b/templates/zh_CN/command.tmpl
+--- a/templates/zh_CN/command.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/command.tmpl	2023-12-14 23:58:24.000000000 -0800
+@@ -0,0 +1,8 @@
++<H2 CLASS="title">{title} 开启 {printer_name}</H2>
++
++<P>{job_state>5?:<IMG SRC="/images/wait.gif" WIDTH="16" HEIGHT="16"
++ALIGN="ABSMIDDLE" ALT="Busy Indicator"> }打印机命令任务
++{job_state=3?挂起:{job_state=4?保留:
++{job_state=5?处理中:{job_state=6?已停止:
++{job_state=7?已取消:{job_state=8?已中止:已完成}}}}}}{job_state=9?:{job_printer_state_message?,
++<EM>"{job_printer_state_message}"</EM>:}}</P>
+diff -ruN a/templates/zh_CN/edit-config.tmpl b/templates/zh_CN/edit-config.tmpl
+--- a/templates/zh_CN/edit-config.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/edit-config.tmpl	2023-12-14 23:59:20.000000000 -0800
+@@ -0,0 +1,20 @@
++<SCRIPT TYPE="text/javascript">
++function reset_config()
++{
++  document.cups.CUPSDCONF.value = "{?cupsdconf_default}";
++}
++</SCRIPT>
++
++<H2 CLASS="title">编辑配置文件</H2>
++
++<FORM NAME="cups" METHOD="POST" ACTION="/admin/">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
++
++<TEXTAREA NAME="CUPSDCONF" COLS="80" ROWS="25">{CUPSDCONF}</TEXTAREA>
++
++<P><INPUT TYPE="SUBMIT" NAME="SAVECHANGES" VALUE="保存更改">
++<INPUT TYPE="BUTTON" VALUE="使用默认配置文件"
++onClick="reset_config();"></P>
++
++</FORM>
+diff -ruN a/templates/zh_CN/error-op.tmpl b/templates/zh_CN/error-op.tmpl
+--- a/templates/zh_CN/error-op.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/error-op.tmpl	2023-12-15 00:00:12.000000000 -0800
+@@ -0,0 +1,5 @@
++<H2 CLASS="title">{?title} {?printer_name} Error</H2>
++
++<P>Error:</P>
++
++<BLOCKQUOTE>未知操作 "{op}"!</BLOCKQUOTE>
+diff -ruN a/templates/zh_CN/error.tmpl b/templates/zh_CN/error.tmpl
+--- a/templates/zh_CN/error.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/error.tmpl	2023-12-14 14:08:08.000000000 -0800
+@@ -0,0 +1,5 @@
++<H2 CLASS="title">{?title} {?printer_name} Error</H2>
++
++<P>{?message?{message}:Error}:</P>
++
++<BLOCKQUOTE>{error}</BLOCKQUOTE>
+diff -ruN a/templates/zh_CN/header.tmpl b/templates/zh_CN/header.tmpl
+--- a/templates/zh_CN/header.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/header.tmpl	2023-12-22 20:29:10.000000000 -0800
+@@ -0,0 +1,35 @@
++<!DOCTYPE HTML>
++<html>
++  <head>
++    <link rel="stylesheet" href="/cups.css" type="text/css">
++    <link rel="shortcut icon" href="/apple-touch-icon.png" type="image/png">
++    <meta charset="utf-8">
++    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
++    {refresh_page?<meta http-equiv="refresh" content="{refresh_page}">:}
++    <meta http-equiv="X-UA-Compatible" content="IE=9">
++    <meta name="viewport" content="width=device-width">
++    <script type="text/javascript"><!--
++      /* Show an error if cookies are disabled */
++      function check_cookies() {
++	if (!navigator.cookieEnabled) {
++	      document.getElementById('body').innerHTML = '此页面使用 cookie 来防止常见的跨站点攻击。 请在您的浏览器中启用 cookie。';
++	}
++      }
++    --></SCRIPT>
++    <title>{title} - CUPS 2.4.7</title>
++  </head>
++  <body onload="check_cookies();">
++    <div class="cups-header">
++      <ul>
++	<li><a href="https://openprinting.github.io/cups/" target="_blank">OpenPrinting CUPS</a></li>
++	<li><a href="/">主页</a></li>
++	<li><a {SECTION=admin?class="active" :}href="/admin">管理</a></li>
++	<li><a {SECTION=classes?class="active" :}href="/classes/">类别</a></li>
++	<li><a {SECTION=help?class="active" :}href="/help/">帮助</a></li>
++	<li><a {SECTION=jobs?class="active" :}href="/jobs/">任务</a></li>
++	<li><a {SECTION=printers?class="active" :}href="/printers/">打印机</a></li>
++      </ul>
++    </div>
++    <div class="body">
++      <div class="row">
++	<h1>{title}</h1>
+\ 文件尾没有换行符
+diff -ruN a/templates/zh_CN/help-header.tmpl b/templates/zh_CN/help-header.tmpl
+--- a/templates/zh_CN/help-header.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/help-header.tmpl	2023-12-15 12:49:28.000000000 -0800
+@@ -0,0 +1,41 @@
++<FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
++{TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
++
++<P ALIGN="CENTER"><B>搜索
++{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:全部文档}}:</B> <INPUT
++TYPE="SEARCH" NAME="QUERY" VALUE="{?QUERY}" SIZE="40" PLACEHOLDER=""
++AUTOSAVE="org.cups.help" RESULTS="20">
++<INPUT TYPE="SUBMIT" NAME="SEARCH" VALUE="搜索">
++<INPUT TYPE="SUBMIT" NAME="CLEAR" VALUE="取消"></P>
++
++</FORM>
++
++<!-- Bookmarks -->
++<DIV CLASS="sidebar"><TABLE CLASS="inset" SUMMARY="目录">
++<TR><TD>
++
++<H3 CLASS="title">在线帮助文档</H3>
++
++<P CLASS="l0"><A HREF="/help/{QUERY??QUERY={QUERY}:}">所有文档</A></P>
++<HR>
++
++{[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
++}
++</TD></TR>
++</TABLE></DIV>
++
++{QUERY?<P>{HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:所有文档搜索结果}}\:</P>
++{QTEXT?<UL>
++{[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (in <I><A HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
++{QTEXT?</UL>:}
++:<P>未找到匹配项.</P>}
++<HR NOSHADE>:}
++{HELPTITLE?<FORM ACTION="/help/{?HELPFILE}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="PRINTABLE" VALUE="YES"><INPUT TYPE="SUBMIT" VALUE="查看打印版本"></FORM>:
++
++<H1>在线帮助</H1>
++
++<P>这是CUPS 在线帮助界面。 在上面输入搜索词或单击文档链接显示联机帮助信息。</P>
++
++<P>如果您不熟悉 CUPS，请阅读"<a href="/help/overview.html">CUPS概述</a>"页.</P>
++
++<P><A HREF="https://openprinting.github.io/cups/">CUPS 主页</A> 还提供许多资源，包括用户论坛、常见问题解答以及用于提交报告和功能请求的表单.</P>}
+diff -ruN a/templates/zh_CN/help-printable.tmpl b/templates/zh_CN/help-printable.tmpl
+--- a/templates/zh_CN/help-printable.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/help-printable.tmpl	2023-12-14 14:08:08.000000000 -0800
+@@ -0,0 +1,9 @@
++<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
++<HTML>
++<HEAD>
++	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
++	<TITLE>{HELPTITLE}</TITLE>
++	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups-printable.css">
++	<LINK REL="SHORTCUT ICON" HREF="/images/cups-icon.png" TYPE="image/png">
++</HEAD>
++<BODY>
+diff -ruN a/templates/zh_CN/job-cancel.tmpl b/templates/zh_CN/job-cancel.tmpl
+--- a/templates/zh_CN/job-cancel.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/job-cancel.tmpl	2023-12-15 09:58:38.000000000 -0800
+@@ -0,0 +1,3 @@
++<H2 CLASS="title">取消任务 {job_id}</H2>
++
++<P><A HREF="{job_printer_uri}">任务 {job_id}</A> 已被取消.
+diff -ruN a/templates/zh_CN/job-hold.tmpl b/templates/zh_CN/job-hold.tmpl
+--- a/templates/zh_CN/job-hold.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/job-hold.tmpl	2023-12-15 10:00:00.000000000 -0800
+@@ -0,0 +1,3 @@
++<H2 CLASS="title">保留任务 {job_id}</H2>
++
++<P><A HREF="{job_printer_uri}">任务 {job_id}</A> 已停止打印.
+diff -ruN a/templates/zh_CN/job-moved.tmpl b/templates/zh_CN/job-moved.tmpl
+--- a/templates/zh_CN/job-moved.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/job-moved.tmpl	2023-12-15 10:17:10.000000000 -0800
+@@ -0,0 +1,4 @@
++<H2 CLASS="title">{job_id?移动任务 {job_id}:移动所有任务}</H2>
++
++<P>{job_id?<A HREF="/jobs/{job_id}">任务 {job_id}</A>:所有任务} 移动到
++<A HREF="/{is_class?classes:printers}/{job_printer_name}">{job_printer_name}</A>.</P>
+diff -ruN a/templates/zh_CN/job-move.tmpl b/templates/zh_CN/job-move.tmpl
+--- a/templates/zh_CN/job-move.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/job-move.tmpl	2023-12-15 10:15:06.000000000 -0800
+@@ -0,0 +1,23 @@
++<FORM METHOD="POST" ACTION="/{SECTION}/{job_id?:{printer_name}}">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
++{job_id?<INPUT TYPE="HIDDEN" NAME="JOB_ID" VALUE="{job_id}">:}
++
++<H2 CLASS="title">{job_id?移动任务 {job_id}:移动所有任务}</H2>
++
++<TABLE>
++<TR>
++<TH CLASS="label">新目标:</TH>
++<TD>
++<SELECT NAME="JOB_PRINTER_URI" SIZE="10">
++{[job_printer_uri]<OPTION VALUE="{job_printer_uri}">{job_printer_name}}
++</SELECT>
++</TD>
++</TR>
++<TR>
++<TD></TD>
++<TD><INPUT TYPE="SUBMIT" VALUE="{job_id?移动任务:移动任务}"></TD>
++</TR>
++</TABLE>
++
++</FORM>
+diff -ruN a/templates/zh_CN/job-release.tmpl b/templates/zh_CN/job-release.tmpl
+--- a/templates/zh_CN/job-release.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/job-release.tmpl	2023-12-15 10:18:26.000000000 -0800
+@@ -0,0 +1,3 @@
++<H2 CLASS="title">释放任务 {job_id}</H2>
++
++<P><A HREF="{job_printer_uri}">任务 {job_id}</A> 已被释放.
+diff -ruN a/templates/zh_CN/job-restart.tmpl b/templates/zh_CN/job-restart.tmpl
+--- a/templates/zh_CN/job-restart.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/job-restart.tmpl	2023-12-15 10:19:44.000000000 -0800
+@@ -0,0 +1,3 @@
++<H2 CLASS="title">重启任务 {job_id}</H2>
++
++<P><A HREF="{job_printer_uri}">任务 {job_id}</A> 已重启.
+diff -ruN a/templates/zh_CN/jobs-header.tmpl b/templates/zh_CN/jobs-header.tmpl
+--- a/templates/zh_CN/jobs-header.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/jobs-header.tmpl	2023-12-15 10:42:54.000000000 -0800
+@@ -0,0 +1,5 @@
++{?which_jobs=?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="显示活动任务"></FORM>}
++{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="completed"><INPUT TYPE="SUBMIT" VALUE="显示已完成任务"></FORM>}
++{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="all"><INPUT TYPE="SUBMIT" VALUE="显示所有任务"></FORM>}
++
++<P ALIGN="CENTER">{?which_jobs=?按处理顺序列出的活跃任务▼; 活动的任务首先显示.:{which_jobs=all?按顺序排列任务▼:按完成或取消顺序，完成的任务▲}}</P>
+diff -ruN a/templates/zh_CN/jobs.tmpl b/templates/zh_CN/jobs.tmpl
+--- a/templates/zh_CN/jobs.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/jobs.tmpl	2023-12-15 10:34:50.000000000 -0800
+@@ -0,0 +1,36 @@
++{#job_id=0?:
++<TABLE CLASS="list" SUMMARY="任务列表">
++<THEAD>
++<TR><TH>ID</TH><TH>名称</TH><TH>用户</TH><TH>大小</TH><TH>页数</TH><TH>状态</TH><TH>操作</TH></TR>
++</THEAD>
++<TBODY>
++{[job_id]
++<TR VALIGN="TOP">
++<TD><A HREF="{job_printer_uri}">{job_printer_name}</A>-{job_id}{?phone? ({phone}):}&nbsp;</TD>
++<TD>{?job_name=?未知:{job_name}}&nbsp;</TD>
++<TD>{?job_originating_user_name=?隐藏:{job_originating_user_name}}&nbsp;</TD>
++<TD>{job_k_octets}k&nbsp;</TD>
++<TD>{job_impressions_completed=0?未知:{?job_impressions_completed}}&nbsp;</TD>
++<TD>{job_state=3?暂挂<BR>{?time_at_creation=?未知:{time_at_creation}}:{job_state=4?暂挂<BR>{?time_at_creation=?未知:{time_at_creation}}:
++{job_state=5?正在处理<BR>{?time_at_processing=?未知:{time_at_processing}}:{job_state=6?停止:
++{job_state=7?取消<BR>{?time_at_completed=?未知:{time_at_completed}}:{job_state=8?中断:已完成<BR>{?time_at_completed=?未知:{time_at_completed}}}}}}}}&nbsp;{job_printer_state_message?<BR>
++<EM>"{job_printer_state_message}"</EM>:}</TD>
++<TD>
++{job_preserved>0?{job_state>5?
++<FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="restart-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}"><INPUT TYPE="SUBMIT" VALUE="重新打印"></FORM>:}:}
++{job_state=4?{job_hold_until=auth-info-required?保留以进行身份验证.:
++<FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="release-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}">
++<INPUT TYPE="SUBMIT" VALUE="释放任务"></FORM>:}:}
++{job_state=3?
++<FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="hold-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}">
++<INPUT TYPE="SUBMIT" VALUE="保留任务"></FORM>:}
++{job_state<7?
++<FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}">
++<INPUT TYPE="SUBMIT" VALUE="取消任务"></FORM>
++<FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="move-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="SUBMIT" VALUE="移动任务"></FORM>:}
++&nbsp;</TD>
++</TR>
++}
++</TBODY>
++</TABLE>
++}
+diff -ruN a/templates/zh_CN/list-available-printers.tmpl b/templates/zh_CN/list-available-printers.tmpl
+--- a/templates/zh_CN/list-available-printers.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/list-available-printers.tmpl	2023-12-15 10:44:06.000000000 -0800
+@@ -0,0 +1,7 @@
++<H2 CLASS="title">可用打印机</H2>
++
++{#device_uri=0?<P>无可用打印机.</P>
++:<UL>{[device_uri]
++<LI><FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="HIDDEN" NAME="TEMPLATE_NAME" VALUE="{template_name}"><INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="Local Printer"><INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{device_make_and_model}"><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}"><INPUT TYPE="SUBMIT" VALUE="添加打印机"></FORM>
++{device_make_and_model} ({device_info})</LI>
++}</UL>}
+diff -ruN a/templates/zh_CN/modify-class.tmpl b/templates/zh_CN/modify-class.tmpl
+--- a/templates/zh_CN/modify-class.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/modify-class.tmpl	2023-12-15 10:46:02.000000000 -0800
+@@ -0,0 +1,31 @@
++<H2 CLASS="title">修改类 {printer_name}</H2>
++
++<FORM METHOD="POST" ACTION="/admin">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
++<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
++
++<TABLE>
++<TR>
++<TH CLASS="label">描述:</TH>
++<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"></TD>
++</TR>
++<TR>
++<TH CLASS="label">本地:</TH>
++<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" VALUE="{?printer_location}" SIZE="40" MAXLENGTH="127"></TD>
++</TR>
++<TR>
++<TH CLASS="label">成员:</TH>
++<TD>
++<SELECT NAME="MEMBER_URIS" SIZE="10" MULTIPLE>
++{[member_uris]<OPTION VALUE="{member_uris}" {?member_selected}>{member_names}}
++</SELECT>
++</TD>
++</TR>
++<TR>
++<TD></TD>
++<TD><INPUT TYPE="SUBMIT" VALUE="修改类"></TD>
++</TR>
++</TABLE>
++
++</FORM>
+diff -ruN a/templates/zh_CN/modify-printer.tmpl b/templates/zh_CN/modify-printer.tmpl
+--- a/templates/zh_CN/modify-printer.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/modify-printer.tmpl	2023-12-15 10:49:14.000000000 -0800
+@@ -0,0 +1,39 @@
++<H2 CLASS="title">修改 {printer_name}</H2>
++
++<FORM METHOD="POST" ACTION="/admin">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
++<INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
++<INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
++<INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
++<INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
++<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
++
++<TABLE>
++<TR>
++<TH CLASS="label">描述:</TH>
++<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"><BR>
++<SMALL>(容易识别的描述，如: "HP LaserJet with Duplexer")</SMALL></TD>
++</TR>
++<TR>
++<TH CLASS="label">位置:</TH>
++<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" VALUE="{?printer_location}" SIZE="40" MAXLENGTH="127"><BR>
++<SMALL>(备注打印机所在地点，如 "实验室 1")</SMALL></TD>
++</TR>
++<TR>
++<TH CLASS="label">连接:</TH>
++<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
++</TR>
++<TR>
++<TH CLASS="label">共享:</TH>
++<TD><INPUT TYPE="CHECKBOX" NAME="PRINTER_IS_SHARED" ID="PRINTER_IS_SHARED" {PRINTER_IS_SHARED=1?CHECKED:}>
++<LABEL FOR="PRINTER_IS_SHARED">共享此打印机</LABEL></TD>
++</TR>
++<TR>
++<TR>
++<TD></TD>
++<TD><INPUT TYPE="SUBMIT" VALUE="继续"></TD>
++</TR>
++</TABLE>
++
++</FORM>
+diff -ruN a/templates/zh_CN/norestart.tmpl b/templates/zh_CN/norestart.tmpl
+--- a/templates/zh_CN/norestart.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/norestart.tmpl	2023-12-15 10:50:48.000000000 -0800
+@@ -0,0 +1,3 @@
++<H2 CLASS="title">更改设置</H2>
++
++<P>服务器未重启，配置未更改...</P>
+diff -ruN a/templates/zh_CN/option-boolean.tmpl b/templates/zh_CN/option-boolean.tmpl
+--- a/templates/zh_CN/option-boolean.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/option-boolean.tmpl	2023-12-14 14:08:08.000000000 -0800
+@@ -0,0 +1,6 @@
++<TR>
++<TH {conflicted=1?CLASS="conflict":CLASS="label"} WIDTH="50%"><A NAME="{keyword}">{keytext}</A>:</TH>
++<TD>
++{[choices]<INPUT TYPE="RADIO" NAME="{keyword-1}" ID="{keyword-1}" {choices={defchoice-1}?CHECKED:} VALUE="{choices}"><LABEL FOR="{keyword-1}">{text}</LABEL>}
++</TD>
++</TR>
+diff -ruN a/templates/zh_CN/option-conflict.tmpl b/templates/zh_CN/option-conflict.tmpl
+--- a/templates/zh_CN/option-conflict.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/option-conflict.tmpl	2023-12-15 10:53:28.000000000 -0800
+@@ -0,0 +1,7 @@
++<P><B>错误:</B> 以下选项有冲突:</P>
++
++<UL>
++{[ckeyword]<LI><A HREF="#{ckeyword}">{ckeytext}</A>: {cchoice}</LI>
++}</UL>
++
++<P>请更改一个或多个选项以解决冲突.</P>
+diff -ruN a/templates/zh_CN/option-header.tmpl b/templates/zh_CN/option-header.tmpl
+--- a/templates/zh_CN/option-header.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/option-header.tmpl	2023-12-14 14:08:08.000000000 -0800
+@@ -0,0 +1,5 @@
++<DIV CLASS="tab" ID="{group_id}">
++
++<H3 ALIGN="CENTER">{group}</H3>
++
++<TABLE WIDTH="100%">
+diff -ruN a/templates/zh_CN/option-pickmany.tmpl b/templates/zh_CN/option-pickmany.tmpl
+--- a/templates/zh_CN/option-pickmany.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/option-pickmany.tmpl	2023-12-14 14:08:08.000000000 -0800
+@@ -0,0 +1,6 @@
++<TR>
++<TH {conflicted=1?CLASS="conflict":CLASS="label"} WIDTH="50%"><A NAME="{keyword}">{keytext}</A>:</TH>
++<TD><SELECT NAME="{keyword}" MULTIPLE SIZE="10">
++{[choices]<OPTION {choices={defchoice-1}?SELECTED:} VALUE="{choices}">{text}}
++</SELECT></TD>
++</TR>
+diff -ruN a/templates/zh_CN/option-pickone.tmpl b/templates/zh_CN/option-pickone.tmpl
+--- a/templates/zh_CN/option-pickone.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/option-pickone.tmpl	2023-12-15 10:55:12.000000000 -0800
+@@ -0,0 +1,18 @@
++<TR>
++<TH {conflicted=1?CLASS="conflict":CLASS="label"} WIDTH="50%"><A NAME="{keyword}">{keytext}</A>:</TH>
++<TD><SELECT NAME="{keyword}" ID="select-{keyword}" ONCHANGE="update_paramtable('{keyword}')">
++{[choices]<OPTION {choices={defchoice-1}?SELECTED:} VALUE="{choices}">{text}}
++</SELECT>
++{iscustom=1?<TABLE NAME="paramtable" id="{keyword}-params">{[params]
++<TR><TH CLASS="sublabel">{paramtext}:</TH>
++<TD>{params=Units?<SELECT NAME="{keyword-1}.{params}">
++<OPTION VALUE="pt"{paramvalue=pt? SELECTED:}>点</OPTION>
++<OPTION VALUE="mm"{paramvalue=mm? SELECTED:}>毫米</OPTION>
++<OPTION VALUE="cm"{paramvalue=cm? SELECTED:}>厘米</OPTION>
++<OPTION VALUE="in"{paramvalue=in? SELECTED:}>英寸</OPTION>
++<OPTION VALUE="ft"{paramvalue=ft? SELECTED:}>英尺</OPTION>
++<OPTION VALUE="m"{paramvalue=m? SELECTED:}>米</OPTION>
++</SELECT>:<INPUT TYPE="{inputtype}" NAME="{keyword-1}.{params}" VALUE="{paramvalue}">}</TD></TR>
++}</TABLE>
++</TD>:}
++</TR>
+diff -ruN a/templates/zh_CN/option-trailer.tmpl b/templates/zh_CN/option-trailer.tmpl
+--- a/templates/zh_CN/option-trailer.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/option-trailer.tmpl	2023-12-15 10:55:40.000000000 -0800
+@@ -0,0 +1,5 @@
++</TABLE>
++
++<P ALIGN="CENTER"><INPUT TYPE="SUBMIT" VALUE="设置默认选项"></P>
++
++</DIV>
+\ 文件尾没有换行符
+diff -ruN a/templates/zh_CN/pager.tmpl b/templates/zh_CN/pager.tmpl
+--- a/templates/zh_CN/pager.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/pager.tmpl	2023-12-15 10:59:14.000000000 -0800
+@@ -0,0 +1,7 @@
++<TABLE CLASS="inset" SUMMARY="Paging Bar">
++<TR>
++	<TD WIDTH="50%">{PREV?{PREV>0?<FORM ACTION="{THISURL}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="QUERY" VALUE="{?QUERY}"><INPUT TYPE="HIDDEN" NAME="WHICH_JOBS" VALUE="{?WHICH_JOBS}"><INPUT TYPE="HIDDEN" NAME="FIRST" VALUE="0"><INPUT TYPE="SUBMIT" VALUE="&#x25c0;&#x25c0; 显示首个"></FORM> :}<FORM ACTION="{THISURL}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="QUERY" VALUE="{?QUERY}"><INPUT TYPE="HIDDEN" NAME="WHICH_JOBS" VALUE="{?WHICH_JOBS}"><INPUT TYPE="HIDDEN" NAME="FIRST" VALUE="{PREV}"><INPUT TYPE="SUBMIT" VALUE="&#x25c0; 显示上一个"></FORM>:&nbsp;}</TD>
++	<TD WIDTH="50%" ALIGN="RIGHT">{NEXT?<FORM ACTION="{THISURL}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="QUERY" VALUE="{?QUERY}"><INPUT TYPE="HIDDEN" NAME="ORDER" VALUE="{?ORDER}"><INPUT TYPE="HIDDEN" NAME="WHICH_JOBS" VALUE="{?WHICH_JOBS}"><INPUT TYPE="HIDDEN" NAME="FIRST" VALUE="{NEXT}"><INPUT TYPE="SUBMIT" VALUE="显示下一个 &#x25b6;"></FORM>:&nbsp;}
++	{LAST?<FORM ACTION="{THISURL}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="QUERY" VALUE="{?QUERY}"><INPUT TYPE="HIDDEN" NAME="WHICH_JOBS" VALUE="{?WHICH_JOBS}"><INPUT TYPE="HIDDEN" NAME="FIRST" VALUE="{LAST}"><INPUT TYPE="SUBMIT" VALUE="显示结尾 &#x25b6;&#x25b6;"></FORM>:}</TD>
++</TR>
++</TABLE>
+diff -ruN a/templates/zh_CN/printer-accept.tmpl b/templates/zh_CN/printer-accept.tmpl
+--- a/templates/zh_CN/printer-accept.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printer-accept.tmpl	2023-12-15 20:04:04.000000000 -0800
+@@ -0,0 +1,5 @@
++<H2 CLASS="title"> {is_class?类:打印机} {printer_name} 已就绪</H2>
++
++<P>{is_class?类:打印机} <A
++HREF="/{is_class?classes:printers}/{printer_name}">{printer_name}</A>
++已就绪.</P>
+diff -ruN a/templates/zh_CN/printer-added.tmpl b/templates/zh_CN/printer-added.tmpl
+--- a/templates/zh_CN/printer-added.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printer-added.tmpl	2023-12-15 11:22:48.000000000 -0800
+@@ -0,0 +1,14 @@
++<H2 CLASS="title">添加打印机 {printer_name}</H2>
++
++<P>打印机 <A HREF="/printers/{printer_name}">{printer_name}</A> 添加成功.
++
++<blockquote>
++<b>注:<b>打印机驱动程序和 RAW 队列已弃用，将在后续CUPS的版本中停止支持.
++</blockquote>
++
++<FORM ACTION="admin/" METHOD="POST">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="OP" VALUE="set-printer-options">
++<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
++<INPUT TYPE="SUBMIT" VALUE="设置打印机选项">
++</FORM>
+diff -ruN a/templates/zh_CN/printer-cancel-jobs.tmpl b/templates/zh_CN/printer-cancel-jobs.tmpl
+--- a/templates/zh_CN/printer-cancel-jobs.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printer-cancel-jobs.tmpl	2023-12-15 19:44:30.000000000 -0800
+@@ -0,0 +1,5 @@
++<H2 CLASS="title">{is_class?类:打印机} {printer_name} 上的任务已取消</H2>
++
++<P>所有任务在 {is_class?类:打印机} <A
++HREF="/{is_class?class:printer}/{printer_name}">{printer_name}</A>
++上已取消.</P>
+diff -ruN a/templates/zh_CN/printer-configured.tmpl b/templates/zh_CN/printer-configured.tmpl
+--- a/templates/zh_CN/printer-configured.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printer-configured.tmpl	2023-12-15 11:28:58.000000000 -0800
+@@ -0,0 +1,4 @@
++<H2 CLASS="title">为 {printer_name} 设置默认选项</H2>
++
++<P>{OP=set-class-options?Class <A HREF="/classes/{printer_name}">:打印机 <A HREF="/printers/{printer_name}">}{printer_name}</A>
++默认选项设置成功.
+diff -ruN a/templates/zh_CN/printer-confirm.tmpl b/templates/zh_CN/printer-confirm.tmpl
+--- a/templates/zh_CN/printer-confirm.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printer-confirm.tmpl	2023-12-15 11:33:44.000000000 -0800
+@@ -0,0 +1,6 @@
++<H2 CLASS="title">删除打印机 {printer_name}</H2>
++
++<P><B>警告:</B> 您确定要删除
++{printer_name} 打印机吗?</P>
++
++<P ALIGN="CENTER"><FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="delete-printer"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}"><INPUT TYPE="SUBMIT" NAME="confirm" VALUE="删除打印机"></FORM></P>
+diff -ruN a/templates/zh_CN/printer-default.tmpl b/templates/zh_CN/printer-default.tmpl
+--- a/templates/zh_CN/printer-default.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printer-default.tmpl	2023-12-15 11:37:56.000000000 -0800
+@@ -0,0 +1,7 @@
++<H2 CLASS="title">设置 {is_class?类:打印机} {printer_name} 为默认</H2>
++
++<P>{is_class?类:打印机} <A
++HREF="/{is_class?classes:printers}/{printer_name}">{printer_name}</A>
++已设置为默认打印机.</P>
++
++<BLOCKQUOTE><B>注:</B> 通过 <TT>lpoptions</TT> 命令中的用户设置，将覆盖该默认值.</BLOCKQUOTE>
+diff -ruN a/templates/zh_CN/printer-deleted.tmpl b/templates/zh_CN/printer-deleted.tmpl
+--- a/templates/zh_CN/printer-deleted.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printer-deleted.tmpl	2023-12-15 11:39:22.000000000 -0800
+@@ -0,0 +1,3 @@
++<H2 CLASS="title">删除打印机 {printer_name}</H2>
++
++<P>打印机 {printer_name} 删除成功.
+diff -ruN a/templates/zh_CN/printer-jobs-header.tmpl b/templates/zh_CN/printer-jobs-header.tmpl
+--- a/templates/zh_CN/printer-jobs-header.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printer-jobs-header.tmpl	2023-12-15 11:39:52.000000000 -0800
+@@ -0,0 +1 @@
++<H3 CLASS="title">任务</H3>
+diff -ruN a/templates/zh_CN/printer-modified.tmpl b/templates/zh_CN/printer-modified.tmpl
+--- a/templates/zh_CN/printer-modified.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printer-modified.tmpl	2023-12-15 11:40:56.000000000 -0800
+@@ -0,0 +1,4 @@
++<H2 CLASS="title">修改打印机 {printer_name}</H2>
++
++<P>打印机 <A HREF="/printers/{printer_name}">{printer_name}</A> 
++修改成功.
+diff -ruN a/templates/zh_CN/printer-reject.tmpl b/templates/zh_CN/printer-reject.tmpl
+--- a/templates/zh_CN/printer-reject.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printer-reject.tmpl	2023-12-15 11:43:16.000000000 -0800
+@@ -0,0 +1,5 @@
++<H2 CLASS="title">{is_class?类:打印机} {printer_name} 拒绝任务 </H2>
++
++<P>{is_class?类:打印机} <A
++HREF="/{is_class?classes:printers}/{printer_name}">{printer_name}</A>
++不再接受任务.</P>
+diff -ruN a/templates/zh_CN/printers-header.tmpl b/templates/zh_CN/printers-header.tmpl
+--- a/templates/zh_CN/printers-header.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printers-header.tmpl	2023-12-15 12:02:16.000000000 -0800
+@@ -0,0 +1 @@
++<P ALIGN="CENTER">{total=0?无打印机:显示 {#printer_name} 台，共 {total} 台打印机}.</P>
+diff -ruN a/templates/zh_CN/printer-start.tmpl b/templates/zh_CN/printer-start.tmpl
+--- a/templates/zh_CN/printer-start.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printer-start.tmpl	2023-12-15 12:55:00.000000000 -0800
+@@ -0,0 +1,5 @@
++<H2 CLASS="title">恢复 {is_class?Class:Printer} {printer_name}</H2>
++
++<P>{is_class?类:打印机} <A
++HREF="/{is_class?classes:printers}/{printer_name}">{printer_name}</A>
++已恢复.</P>
+diff -ruN a/templates/zh_CN/printers.tmpl b/templates/zh_CN/printers.tmpl
+--- a/templates/zh_CN/printers.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printers.tmpl	2023-12-15 11:46:14.000000000 -0800
+@@ -0,0 +1,11 @@
++{#printer_name=0?:
++<TABLE CLASS="list" SUMMARY="打印机列表">
++<THEAD>
++<TR><TH>队列名称</TH><TH>描述</TH><TH>位置</TH><TH>品牌及型号</TH><TH>状态</TH></TR>
++</THEAD>
++<TBODY>
++{[printer_name]
++<TR><TD><A HREF="{printer_uri_supported}">{printer_name}</A></TD><TD>{printer_info}</TD><TD>{printer_location}</TD><TD>{printer_make_and_model}</TD><TD>{printer_state=3?空闲:{printer_state=4?处理中:已暂停}}{printer_state_message? - "{printer_state_message}":}</TD></TR>
++}
++</TBODY>
++</TABLE></DIV>}
+diff -ruN a/templates/zh_CN/printer-stop.tmpl b/templates/zh_CN/printer-stop.tmpl
+--- a/templates/zh_CN/printer-stop.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printer-stop.tmpl	2023-12-15 19:55:22.000000000 -0800
+@@ -0,0 +1,5 @@
++<H2 CLASS="title">暂停 {is_class?类:打印机} {printer_name}</H2>
++
++<P>{is_class?类:打印机} <A
++HREF="/{is_class?classes:printers}/{printer_name}">{printer_name}</A>
++已暂停.</P>
+diff -ruN a/templates/zh_CN/printer.tmpl b/templates/zh_CN/printer.tmpl
+--- a/templates/zh_CN/printer.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/printer.tmpl	2023-12-15 11:12:02.000000000 -0800
+@@ -0,0 +1,43 @@
++<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
++({printer_state=3?空闲:{printer_state=4?处理中:已暂停}},
++{printer_is_accepting_jobs=0?拒绝任务:接受任务},
++{server_is_sharing_printers=0?Not:{printer_is_shared=0?Not:}} 共享{default_name={printer_name}?, 默认打印机:})</H2>
++
++<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
++<OPTION VALUE="">维护</OPTION>
++<OPTION VALUE="print-test-page">打印测试页</OPTION>
++{printer_commands~.*Clean.*?<OPTION VALUE="clean-print-heads">清洁打印头</OPTION>:}
++{printer_commands~.*PrintSelfTestPage.*?<OPTION VALUE="print-self-test-page">打印自检页</OPTION>:}
++{printer_state=5?<OPTION VALUE="start-printer">恢复打印</OPTION>:<OPTION VALUE="stop-printer">暂停打印</OPTION>}
++{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">接受任务</OPTION>:<OPTION VALUE="reject-jobs">拒绝任务</OPTION>}
++<OPTION VALUE="move-jobs">移动所有任务</OPTION>
++<OPTION VALUE="cancel-jobs">取消所有任务</OPTION>
++</SELECT>
++<NOSCRIPT><INPUT TYPE="SUBMIT" VALUE="Go"></NOSCRIPT>
++</FORM>
++
++<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
++<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
++<OPTION VALUE="">管理</OPTION>
++<OPTION VALUE="modify-printer">修改</OPTION>
++<OPTION VALUE="delete-printer">删除</OPTION>
++<OPTION VALUE="set-printer-options">设置默认选项</OPTION>
++<OPTION VALUE="set-as-default">设为默认打印机</OPTION>
++<OPTION VALUE="set-allowed-users">设置许可用户</OPTION>
++</SELECT>
++<NOSCRIPT><INPUT TYPE="SUBMIT" VALUE="Go"></NOSCRIPT>
++</FORM>
++
++<TABLE SUMMARY="{printer_name}">
++<TR><TH ALIGN="RIGHT" VALIGN="TOP">描述:</TH><TD>{printer_info}</TD></TR>
++<TR><TH ALIGN="RIGHT" VALIGN="TOP">位置:</TH><TD>{printer_location}</TD></TR>
++<TR><TH ALIGN="RIGHT" VALIGN="TOP">驱动:</TH><TD>{printer_make_and_model} ({color_supported=1?color:grayscale}{sides_supported=one-sided?:, 2-sided printing})<BR>
++<TR><TH ALIGN="RIGHT" VALIGN="TOP">连接:</TH><TD>{device_uri}</TD></TR>
++<TR><TH ALIGN="RIGHT" VALIGN="TOP">默认值:</TH><TD>job-sheets={job_sheets_default}
++media={media_default?{media_default}:未知}
++{sides_default?sides={sides_default}:}</TD></TR>
++</TABLE>
+diff -ruN a/templates/zh_CN/restart.tmpl b/templates/zh_CN/restart.tmpl
+--- a/templates/zh_CN/restart.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/restart.tmpl	2023-12-15 12:08:48.000000000 -0800
+@@ -0,0 +1,4 @@
++<H2 CLASS="title">更改设置</H2>
++
++<P><IMG SRC="data:image/gif;base64,R0lGODlhEAAQAIQAAP///wAAAPDw8IqKiuDg4EZGRnp6egAAAFhYWCQkJKysrL6+vhQUFJycnAQEBDY2NmhoaP///////////////////////////////////////////////////////////yH/C05FVFNDQVBFMi4wAwEAAAAh+QQABQD/ACwAAAAAEAAQAAAFdyAgAgIJIeWoAkRCCMdBkKtIHIngyMKsErPBYbADpkSCwhDmQCBethRB6Vj4kFCkQPG4IlWDgrNRIwnO4UKBXDufzQvDMaoSDBgFb886MiQadgNABAokfCwzBA8LCg0Egl8jAggGAA1kBIA1BAYzlyILczULC2UhACH5BAEFAB8ALAAAAAAQABAAAAV2ICACAmlAZTmOREEIyUEQjLKKxPHADhEvqxlgcGgkGI1DYSVAIAWMx+lwSKkICJ0QsHi9RgKBwnVTiRQQgwF4I4UFDQQEwi6/3YSGWRRmjhEETAJfIgMFCnAKM0KDV4EEEAQLiF18TAYNXDaSe3x6mjidN1s3IQAh+QQBBQAfACwAAAAAEAAQAAAFeCAgAgLZDGU5jgRECEUiCI+yioSDwDJyLKsXoHFQxBSHAoAAFBhqtMJg8DgQBgfrEsJAEAg4YhZIEiwgKtHiMBgtpg3wbUZXGO7kOb1MUKRFMysCChAoggJCIg0GC2aNe4gqQldfL4l/Ag1AXySJgn5LcoE3QXI3IQAh+QQBBQAfACwAAAAAEAAQAAAFdiAgAgLZNGU5joQhCEjxIssqEo8bC9BRjy9Ag7GILQ4QEoE0gBAEBcOpcBA0DoxSK/e8LRIHn+i1cK0IyKdg0VAoljYIg+GgnRrwVS/8IAkICyosBIQpBAMoKy9dImxPhS+GKkFrkX+TigtLlIyKXUF+NjagNiEAIfkEAQUAHwAsAAAAABAAEAAABWwgIAICaRhlOY4EIgjH8R7LKhKHGwsMvb4AAy3WODBIBBKCsYA9TjuhDNDKEVSERezQEL0WrhXucRUQGuik7bFlngzqVW9LMl9XWvLdjFaJtDFqZ1cEZUB0dUgvL3dgP4WJZn4jkomWNpSTIyEAIfkEAQUAHwAsAAAAABAAEAAABX4gIAICuSxlOY6CIgiD8RrEKgqGOwxwUrMlAoSwIzAGpJpgoSDAGifDY5kopBYDlEpAQBwevxfBtRIUGi8xwWkDNBCIwmC9Vq0aiQQDQuK+VgQPDXV9hCJjBwcFYU5pLwwHXQcMKSmNLQcIAExlbH8JBwttaX0ABAcNbWVbKyEAIfkEAQUAHwAsAAAAABAAEAAABXkgIAICSRBlOY7CIghN8zbEKsKoIjdFzZaEgUBHKChMJtRwcWpAWoWnifm6ESAMhO8lQK0EEAV3rFopIBCEcGwDKAqPh4HUrY4ICHH1dSoTFgcHUiZjBhAJB2AHDykpKAwHAwdzf19KkASIPl9cDgcnDkdtNwiMJCshACH5BAEFAB8ALAAAAAAQABAAAAV3ICACAkkQZTmOAiosiyAoxCq+KPxCNVsSMRgBsiClWrLTSWFoIQZHl6pleBh6suxKMIhlvzbAwkBWfFWrBQTxNLq2RG2yhSUkDs2b63AYDAoJXAcFRwADeAkJDX0AQCsEfAQMDAIPBz0rCgcxky0JRWE1AmwpKyEAIfkEAQUAHwAsAAAAABAAEAAABXkgIAICKZzkqJ4nQZxLqZKv4NqNLKK2/Q4Ek4lFXChsg5ypJjs1II3gEDUSRInEGYAw6B6zM4JhrDAtEosVkLUtHA7RHaHAGJQEjsODcEg0FBAFVgkQJQ1pAwcDDw8KcFtSInwJAowCCA6RIwqZAgkPNgVpWndjdyohACH5BAEFAB8ALAAAAAAQABAAAAV5ICACAimc5KieLEuUKvm2xAKLqDCfC2GaO9eL0LABWTiBYmA06W6kHgvCqEJiAIJiu3gcvgUsscHUERm+kaCxyxa+zRPk0SgJEgfIvbAdIAQLCAYlCj4DBw0IBQsMCjIqBAcPAooCBg9pKgsJLwUFOhCZKyQDA3YqIQAh+QQBBQAfACwAAAAAEAAQAAAFdSAgAgIpnOSonmxbqiThCrJKEHFbo8JxDDOZYFFb+A41E4H4OhkOipXwBElYITDAckFEOBgMQ3arkMkUBdxIUGZpEb7kaQBRlASPg0FQQHAbEEMGDSVEAA1QBhAED1E0NgwFAooCDWljaQIQCE5qMHcNhCkjIQAh+QQBBQAfACwAAAAAEAAQAAAFeSAgAgIpnOSoLgxxvqgKLEcCC65KEAByKK8cSpA4DAiHQ/DkKhGKh4ZCtCyZGo6F6iYYPAqFgYy02xkSaLEMV34tELyRYNEsCQyHlvWkGCzsPgMCEAY7Cg04Uk48LAsDhRA8MVQPEF0GAgqYYwSRlycNcWskCkApIyEAOw==" WIDTH="16" HEIGHT="16" ALIGN="ABSMIDDLE"
++ALT="Busy Indicator"> 正在重启服务器，请稍后...</P>
+diff -ruN a/templates/zh_CN/search.tmpl b/templates/zh_CN/search.tmpl
+--- a/templates/zh_CN/search.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/search.tmpl	2023-12-15 21:48:54.000000000 -0800
+@@ -0,0 +1,10 @@
++<FORM ACTION="/{SECTION}/{?SEARCH_DEST}" METHOD="GET">
++{WHICH_JOBS?<INPUT TYPE="HIDDEN" NAME="WHICH_JOBS" VALUE="{WHICH_JOBS}">:}
++{ORDER?<INPUT TYPE="HIDDEN" NAME="ORDER" VALUE="{ORDER}">:}
++
++<P ALIGN="CENTER"><B>
++{SEARCH_DEST?{SEARCH_DEST}:{SECTION=classes?类:{SECTION=jobs?任务:打印机}}} 搜索:</B>
++<INPUT TYPE="SEARCH" NAME="QUERY" VALUE="{?QUERY}" SIZE="40"  PLACEHOLDER="" AUTOSAVE="org.cups.{SECTION}" RESULTS="20"> <INPUT
++TYPE="SUBMIT" VALUE="搜索"> <INPUT TYPE="SUBMIT" NAME="CLEAR" VALUE="取消"></P>
++
++</FORM>
+diff -ruN a/templates/zh_CN/set-printer-options-header.tmpl b/templates/zh_CN/set-printer-options-header.tmpl
+--- a/templates/zh_CN/set-printer-options-header.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/set-printer-options-header.tmpl	2023-12-15 12:17:24.000000000 -0800
+@@ -0,0 +1,24 @@
++<H2 CLASS="title">设置 {printer_name} 为默认选项</H2>
++
++<FORM METHOD="POST" ACTION="/admin">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
++<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
++{HAVE_AUTOCONFIGURE?<INPUT TYPE="SUBMIT" NAME="AUTOCONFIGURE" VALUE="查询打印机默认选项">:}
++
++<SCRIPT TYPE="text/javascript"><!--
++function update_paramtable(option)
++{
++  var cb = document.getElementById("select-" + option)
++  var paramstable = document.getElementById(option + "-params");
++  if (cb.value == "Custom")
++    paramstable.style.display = "table";
++  else
++    paramstable.style.display = "none";
++}
++--></SCRIPT>
++
++<H3 CLASS="title">{[group_id]
++<A HREF="#{group_id}">{group}</A>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</H3>
++
++<DIV CLASS="tabs">
+diff -ruN a/templates/zh_CN/set-printer-options-trailer.tmpl b/templates/zh_CN/set-printer-options-trailer.tmpl
+--- a/templates/zh_CN/set-printer-options-trailer.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/set-printer-options-trailer.tmpl	2023-12-14 14:08:08.000000000 -0800
+@@ -0,0 +1,14 @@
++</DIV>
++
++<SCRIPT TYPE="text/javascript"><!--
++// Hide custom options parameters for browsers that understand Javascript
++var paramtables = document.getElementsByName("paramtable");
++for (var i = 0; i < paramtables.length; i++)
++{
++  var opt = paramtables[i].id.substr(0, paramtables[i].id.lastIndexOf("-"));
++  var cb = document.getElementById("select-" + opt);
++  if (cb.value != "Custom")
++    paramtables[i].style.display = "none";
++}
++--></SCRIPT>
++</FORM>
+diff -ruN a/templates/zh_CN/test-page.tmpl b/templates/zh_CN/test-page.tmpl
+--- a/templates/zh_CN/test-page.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/test-page.tmpl	2023-12-15 12:20:28.000000000 -0800
+@@ -0,0 +1,4 @@
++<H2 CLASS="title">在 {printer_name} 上打印测试页</H2>
++
++<P>发送测试页；任务编号为 <A HREF="/{SECTION}/{printer_name}">
++{printer_name}-{job_id}</A>.</P>
+diff -ruN a/templates/zh_CN/trailer.tmpl b/templates/zh_CN/trailer.tmpl
+--- a/templates/zh_CN/trailer.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/trailer.tmpl	2023-12-15 12:29:14.000000000 -0800
+@@ -0,0 +1,5 @@
++      </div>
++    </div>
++    <div class="footer">CUPS 和 CUPS 徽标是<a href="http://www.OpenPrinting.com">OpenPrinting</a>的商标 版权所有 &copy; 2021-2022 OpenPrinting，保留所有权利。</div>
++  </body>
++</html>
+diff -ruN a/templates/zh_CN/users.tmpl b/templates/zh_CN/users.tmpl
+--- a/templates/zh_CN/users.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/zh_CN/users.tmpl	2023-12-15 13:05:34.000000000 -0800
+@@ -0,0 +1,27 @@
++<FORM METHOD="POST" ACTION="/admin">
++<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
++<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{OP}">
++<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
++{IS_CLASS?<INPUT TYPE="HIDDEN" NAME="IS_CLASS" VALUE="{IS_CLASS}">:}
++
++<H2 CLASS="title">设置许可 {printer_name} 的用户</H2>
++
++<TABLE>
++<TR>
++<TH CLASS="label">用户:</TH>
++<TD>
++<INPUT TYPE='TEXT' NAME='users' SIZE='60' VALUE='{?requesting_user_name_allowed}{?requesting_user_name_denied}'>
++<BR>
++<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-allowed' ID='requesting-user-name-allowed' {requesting_user_name_allowed?checked:}><LABEL FOR='requesting-user-name-allowed'>允许用户打印</LABEL>
++<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-denied' ID='requesting-user-name-denied' {requesting_user_name_denied?checked:}><LABEL FOR='requesting-user-name-denied'>禁止用户打印</LABEL>
++</TD>
++</TR>
++<TR>
++<TD></TD>
++<TD>
++<INPUT TYPE="SUBMIT" VALUE="设置用户">
++</TD>
++</TR>
++</TABLE>
++
++</FORM>

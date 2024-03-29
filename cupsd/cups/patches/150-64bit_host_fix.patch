@@ -1,0 +1,33 @@
+--- a/config-scripts/cups-directories.m4
++++ b/config-scripts/cups-directories.m4
+@@ -96,7 +96,7 @@ if test "$libdir" = "\${exec_prefix}/lib
+ AS_IF([test "$libdir" = "\${exec_prefix}/lib"], [
+     AS_CASE(["$host_os_name"], [linux*], [
+ 	AS_IF([test -d /usr/lib64 -a ! -d /usr/lib64/fakeroot], [
+-	    libdir="$exec_prefix/lib64"
++	    libdir="$exec_prefix/lib"
+ 	], [
+ 	    libdir="$exec_prefix/lib"
+ 	])
+--- a/configure
++++ b/configure
+@@ -7302,7 +7302,7 @@ if test "$libdir" = "\${exec_prefix}/lib
+ 	if test -d /usr/lib64 -a ! -d /usr/lib64/fakeroot
+ then :
+ 
+-	    libdir="$exec_prefix/lib64"
++	    libdir="$exec_prefix/lib"
+ 
+ else $as_nop
+ 
+--- a/cups-config.in
++++ b/cups-config.in
+@@ -44,7 +44,7 @@ else
+ 	CFLAGS="$CFLAGS -I$includedir"
+     fi
+ 
+-    if test $libdir != /usr/lib -a $libdir != /usr/lib32 -a $libdir != /usr/lib64; then
++    if test $libdir != /usr/lib -a $libdir != /usr/lib -a $libdir != /usr/lib; then
+ 	LDFLAGS="$LDFLAGS -L$libdir"
+     fi
+ fi

@@ -1,0 +1,10 @@
+--- a/configure
++++ b/configure
+@@ -7098,7 +7098,7 @@ LIBHEADERSPRIV="\$(COREHEADERSPRIV) \$(D
+ case "$COMPONENTS" in #(
+   all) :
+ 
+-    BUILDDIRS="tools filter backend berkeley cgi-bin monitor notifier ppdc scheduler systemv conf data desktop locale man doc examples templates"
++    BUILDDIRS="tools filter backend berkeley cgi-bin monitor ppdc scheduler systemv conf data desktop locale man doc examples templates"
+  ;; #(
+   core) :
